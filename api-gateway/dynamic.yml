@@ -1,0 +1,31 @@
+# dynamic.yml
+# Configuración dinámica para desarrollo local.
+#
+# Objetivo (etapa actual):
+# - Enrutar /api/auth/* desde Traefik hacia el Auth Service corriendo en tu máquina (fuera de Docker)
+# - Mantener el Auth Service sin Dockerfile por ahora
+#
+# Nota: En Docker Desktop (Windows/macOS) `host.docker.internal` apunta al host.
+
+http:
+  routers:
+    auth-router:
+      rule: "PathPrefix(`/api/auth`)"
+      entryPoints:
+        - web
+      service: auth-service
+      middlewares:
+        - auth-strip-prefix
+
+  services:
+    auth-service:
+      loadBalancer:
+        passHostHeader: true
+        servers:
+          - url: "http://host.docker.internal:8081"
+
+  middlewares:
+    auth-strip-prefix:
+      stripPrefix:
+        prefixes:
+          - "/api/auth"
