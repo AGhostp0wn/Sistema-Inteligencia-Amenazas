@@ -1,0 +1,25 @@
+# --- Java ---
+**/target/
+**/.gradle/
+**/build/
+
+# --- Go ---
+**/bin/
+**/pkg/
+
+# --- Python ---
+**/__pycache__/
+**/*.pyc
+**/.venv/
+**/venv/
+**/.env
+
+# --- Frontend (Node/React) ---
+**/node_modules/
+**/build/
+**/dist/
+**/.pnpm-store/
+
+# --- Docker & OS ---
+**/.DS_Store
+Thumbs.db

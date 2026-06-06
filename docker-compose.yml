@@ -1,0 +1,59 @@
+version: '3.8'
+
+networks:
+  threatguard-net:
+    driver: bridge
+
+services:
+  traefik:
+    image: "traefik:v2.10"
+    container_name: "traefik"
+    command:
+      - "--configFile=/etc/traefik/traefik.yml"
+    ports:
+      - "80:80" # Puerto para el tráfico de aplicaciones
+      - "8080:8080" # Puerto para el dashboard de Traefik
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./api-gateway/traefik.yml:/etc/traefik/traefik.yml:ro"
+      - "./api-gateway/dynamic.yml:/etc/traefik/dynamic.yml:ro"
+    networks:
+      - threatguard-net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dashboard.rule=Host(`localhost`) && PathPrefix(`/dashboard`)"
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.services.dummy-service.loadbalancer.server.port=9999" # Puerto dummy, no se usa
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres_db
+    env_file:
+      - .env
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - threatguard-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis_cache
+    ports:
+      - "6379:6379"   # <-- agregar esto
+    networks:
+      - threatguard-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
