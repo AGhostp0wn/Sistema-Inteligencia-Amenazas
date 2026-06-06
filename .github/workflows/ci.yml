@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - pruebas
 
 jobs:
   build-and-push:
