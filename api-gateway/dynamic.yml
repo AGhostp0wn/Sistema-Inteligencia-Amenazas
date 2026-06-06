@@ -24,24 +24,36 @@ http:
       middlewares:
         - report-strip-prefix
 
+    frontend-router:
+      rule: "PathPrefix(`/`)"
+      entryPoints:
+        - web
+      service: frontend-service
+      priority: 1
+
   services:
     auth-service:
       loadBalancer:
         passHostHeader: true
         servers:
-          - url: "http://host.docker.internal:8081"
+          - url: "http://auth_service:8081"
 
     threat-service:
       loadBalancer:
         passHostHeader: true
         servers:
-          - url: "http://host.docker.internal:8000"
+          - url: "http://threat_service:8000"
 
     report-service:
       loadBalancer:
         passHostHeader: true
         servers:
-          - url: "http://host.docker.internal:8090"
+          - url: "http://report_service:8090"
+
+    frontend-service:
+      loadBalancer:
+        servers:
+          - url: "http://frontend:80"
 
   middlewares:
     auth-strip-prefix:

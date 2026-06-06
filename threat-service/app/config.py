@@ -7,7 +7,7 @@ class Settings(BaseSettings):
     urlhaus_api_key: str  # agregar esta línea
 
     # Apunta al contenedor redis_cache en la red threatguard-net
-    redis_url: str = "redis://localhost:6379"
+    redis_url: str = "redis://redis_cache:6379"
     cache_ttl_seconds: int = 1800
 
     jwt_secret: str
