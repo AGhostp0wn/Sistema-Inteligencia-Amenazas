@@ -1,0 +1,15 @@
+# Service = expone el pod dentro del cluster
+# Los demás pods usan el nombre del Service como hostname
+# auth-service se conecta a "postgres:5432" gracias a esto
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres                  # este nombre es el hostname dentro del cluster
+  namespace: threatguard
+spec:
+  selector:
+    app: postgres                 # apunta a los pods con label app: postgres
+  ports:
+    - port: 5432                  # puerto que expone el Service
+      targetPort: 5432            # puerto del contenedor
+  type: ClusterIP                 # solo accesible dentro del cluster, no desde afuera

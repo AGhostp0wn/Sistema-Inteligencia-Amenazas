@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: threat-service
+  namespace: threatguard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: threat-service
+  template:
+    metadata:
+      labels:
+        app: threat-service
+    spec:
+      containers:
+        - name: threat-service
+          image: alexanderpwned/threatguard-threat:latest
+          ports:
+            - containerPort: 8000
+          env:
+            - name: ABUSEIPDB_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: threat-secret
+                  key: ABUSEIPDB_API_KEY
+            - name: OTX_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: threat-secret
+                  key: OTX_API_KEY
+            - name: URLHAUS_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: threat-secret
+                  key: URLHAUS_API_KEY
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: threat-secret
+                  key: JWT_SECRET
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: threat-secret
+                  key: REDIS_URL

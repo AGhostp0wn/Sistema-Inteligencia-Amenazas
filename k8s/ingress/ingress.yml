@@ -1,0 +1,50 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: threatguard-ingress
+  namespace: threatguard
+  annotations:
+    # Captura el prefijo y extrae el resto en el segundo grupo ($2)
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    # Buenas prácticas obligatorias para usar expresiones regulares
+    nginx.ingress.kubernetes.io/use-regex: "true"
+spec:
+  rules:
+    - host: localhost
+      http:
+        paths:
+          # 1. Auth Service (Primero)
+          - path: /api/auth(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: auth-service
+                port:
+                  number: 8081
+
+          # 2. Threat Service
+          - path: /api/threat(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: threat-service
+                port:
+                  number: 8000
+
+          # 3. Report Service
+          - path: /api/report(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: report-service
+                port:
+                  number: 8090
+
+          # 4. Frontend — Siempre al FINAL para que no absorba el tráfico de las APIs
+          - path: /()(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: frontend
+                port:
+                  number: 80

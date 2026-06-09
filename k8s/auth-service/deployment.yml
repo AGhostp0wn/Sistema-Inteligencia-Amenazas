@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-service
+  namespace: threatguard
+spec:
+  replicas: 1                    # puedes subir a 2 o 3 para alta disponibilidad
+  selector:
+    matchLabels:
+      app: auth-service
+  template:
+    metadata:
+      labels:
+        app: auth-service
+    spec:
+      # 👇 SECCIÓN AGREGADA: Bloquea el inicio de Spring Boot hasta que Postgres responda
+      # 👇 REEMPLAZA TU INIT CONTAINER ANTERIOR POR ESTE
+      initContainers:
+        - name: wait-for-postgres
+          image: postgres:15-alpine  # Usamos la misma imagen para tener "pg_isready"
+          env:
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: auth-secret
+                  key: DB_HOST
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: auth-secret
+                  key: POSTGRES_USER
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: auth-secret
+                  key: POSTGRES_DB
+          command: 
+            - sh
+            - -c
+            - |
+              until pg_isready -h $DB_HOST -p 5432 -U $POSTGRES_USER -d $POSTGRES_DB; do
+                echo "Esperando a que el motor de Postgres esté totalmente listo y acepte conexiones..."
+                sleep 2
+              done
+      # 👆 Fin de la sección modificada
+
+      containers:
+        - name: auth-service
+          image: alexanderpwned/threatguard-auth:latest  # imagen de Docker Hub
+          ports:
+            - containerPort: 8081
+          env:
+          # 👇 LE CORREGIMOS EL HOST APUNTANDO AL SERVICE DE KUBERNETES
+            - name: SPRING_DATASOURCE_URL
+              value: "jdbc:postgresql://postgres:5432/threatguard_db"
+          
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: auth-secret
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: auth-secret
+                  key: POSTGRES_PASSWORD
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: auth-secret
+                  key: POSTGRES_DB
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: auth-secret
+                  key: JWT_SECRET
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: auth-secret
+                  key: DB_HOST
+                  

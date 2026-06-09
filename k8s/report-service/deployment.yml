@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: report-service
+  namespace: threatguard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: report-service
+  template:
+    metadata:
+      labels:
+        app: report-service
+    spec:
+      containers:
+        - name: report-service
+          image: alexanderpwned/threatguard-report:latest
+          ports:
+            - containerPort: 8090
+          env:
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: report-secret
+                  key: JWT_SECRET
+            - name: PORT
+              valueFrom:
+                secretKeyRef:
+                  name: report-secret
+                  key: PORT

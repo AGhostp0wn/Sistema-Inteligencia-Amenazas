@@ -1,0 +1,6 @@
+# Un namespace es como una carpeta lógica dentro del cluster
+# Agrupa todos los recursos de ThreatGuard separados del resto
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: threatguard
