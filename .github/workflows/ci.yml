@@ -1,4 +1,4 @@
-name: CI — Build & Push Docker Images
+name: CI/CD - Build, Push & Deploy
 
 on:
   push:
@@ -47,3 +47,27 @@ jobs:
           context: ./threatguard-frontend
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/threatguard-frontend:latest
+
+  deploy-to-aws:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Configurar SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.AWS_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Agregar host AWS
+        run: |
+          ssh-keyscan -H ${{ secrets.AWS_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy K3s
+        run: |
+          ssh ${{ secrets.AWS_USER }}@${{ secrets.AWS_HOST }} "
+            /usr/local/bin/kubectl rollout restart deployment/auth-service -n threatguard &&
+            /usr/local/bin/kubectl rollout restart deployment/threat-service -n threatguard &&
+            /usr/local/bin/kubectl rollout restart deployment/report-service -n threatguard &&
+            /usr/local/bin/kubectl rollout restart deployment/frontend -n threatguard
+          "
