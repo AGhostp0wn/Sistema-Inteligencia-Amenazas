@@ -50,8 +50,8 @@ public class SecurityConfig {
         config.setAllowedOrigins(List.of(
             "http://44.200.118.48",
             "http://localhost:5173",
-            "http://localhost:3000"
-            //"http://localhost:3000"
+            "http://localhost:3000",
+            "http://54.175.164.49"
         ));
 
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
