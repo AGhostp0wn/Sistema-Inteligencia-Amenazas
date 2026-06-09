@@ -48,6 +48,7 @@ public class SecurityConfig {
 
         // Permite el frontend en desarrollo
         config.setAllowedOrigins(List.of(
+            "http://44.200.118.48",
             "http://localhost:5173",
             "http://localhost:3000"
         ));

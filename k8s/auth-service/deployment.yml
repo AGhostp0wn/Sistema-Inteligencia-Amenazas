@@ -46,7 +46,8 @@ spec:
 
       containers:
         - name: auth-service
-          image: alexanderpwned/threatguard-auth:latest  # imagen de Docker Hub
+          image: alexanderpwned/threatguard-auth:latest
+          imagePullPolicy: Always  # imagen de Docker Hub
           ports:
             - containerPort: 8081
           env:
