@@ -48,7 +48,7 @@ export default function LoginPage() {
             Iniciar sesión
           </h1>
           <p className="text-gray-500 text-sm mb-6">
-            Plataforma de Threat Intelligence
+            Plataforma de Threat Intelligence. CAMBIO PARA PRUEBA DEL CD AWS, IGNORAR ESTE CAMBIO
           </p>
 
           <form onSubmit={submit} className="space-y-4">

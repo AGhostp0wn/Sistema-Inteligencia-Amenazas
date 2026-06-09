@@ -51,6 +51,7 @@ public class SecurityConfig {
             "http://44.200.118.48",
             "http://localhost:5173",
             "http://localhost:3000"
+            //"http://localhost:3000"
         ));
 
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
