@@ -16,5 +16,6 @@ spec:
       containers:
         - name: frontend
           image: alexanderpwned/threatguard-frontend:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 80
